@@ -1,0 +1,7 @@
+run	sample	age	sex	race	RIN	group
+SRR1554537	R3452	-0.3836	female	AA	9.6	fetal
+SRR1554538	R3462	-0.4027	female	AA	6.4	fetal
+SRR1554541	R3485	-0.3836	male	AA	5.7	fetal
+SRR1554535	R2869	41.58	male	AA	8.7	adult
+SRR1554536	R3098	44.17	female	AA	5.3	adult
+SRR1554539	R3467	36.5	female	AA	9	adult

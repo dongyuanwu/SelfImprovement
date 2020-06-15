@@ -1,0 +1,77 @@
+---
+title: 'Task 3: QC the Alignment'
+author: "Dongyuan Wu"
+date: '`r Sys.Date()`'
+output:
+  pdf_document: default
+---
+
+In task 2, I downloaded FASTQ data using EBI SRA on Galaxy, and then used HISAT2 for alignment. There are totally 12 samples (6 fetal vs. 6 adult) available. However, due to the resource limitation, I only chose half of them (3 fetal vs. 3 adult) to analyze. In addition, there are 2 runs (SRR15545xx and SRR20713xx) for each sample. Only SRR15545xx runs were used.
+
+In this task, I used FastQC on Galaxy to do quality control. All the parameters were default. In this way, I got two kinds of results for each sample: a webpage report with summary graphs and a text file with statistical results. Due to page limitation, I directly summarize information from the text file using R (without showing any graphs).
+
+I am not sure what kind of number from report represents *"average quality score of mapped reads"*, so I calculated two numbers:
+
+1. **mean_perbase**: I extracted the `Mean` column from `Per base sequence quality` table, and calculated the avarage of this column.
+
+2. **mean_perseq**: This one is computed from `Per sequence quality scores` table. The rule is: Calculated the sum of `Quality` $\times$ `Count`, and then divided by the sum of `Count`.
+
+```{r, echo=FALSE}
+
+dat11 <- read.table("Galaxy20-[FastQC_on_data_13__RawData].txt", skip=12, nrows=55)
+dat12 <- read.table("Galaxy20-[FastQC_on_data_13__RawData].txt", skip=71, nrows=39)
+dat21 <- read.table("Galaxy22-[FastQC_on_data_14__RawData].txt", skip=12, nrows=55)
+dat22 <- read.table("Galaxy22-[FastQC_on_data_14__RawData].txt", skip=71, nrows=39)
+dat31 <- read.table("Galaxy24-[FastQC_on_data_15__RawData].txt", skip=12, nrows=55)
+dat32 <- read.table("Galaxy24-[FastQC_on_data_15__RawData].txt", skip=71, nrows=39)
+dat41 <- read.table("Galaxy26-[FastQC_on_data_16__RawData].txt", skip=12, nrows=55)
+dat42 <- read.table("Galaxy26-[FastQC_on_data_16__RawData].txt", skip=71, nrows=39)
+dat51 <- read.table("Galaxy28-[FastQC_on_data_17__RawData].txt", skip=12, nrows=55)
+dat52 <- read.table("Galaxy28-[FastQC_on_data_17__RawData].txt", skip=71, nrows=39)
+dat61 <- read.table("Galaxy30-[FastQC_on_data_18__RawData].txt", skip=12, nrows=55)
+dat62 <- read.table("Galaxy30-[FastQC_on_data_18__RawData].txt", skip=71, nrows=39)
+
+mean_perbase <- c(mean(dat11$V2), mean(dat21$V2), mean(dat31$V2), mean(dat41$V2),
+                  mean(dat51$V2), mean(dat61$V2))
+mean_perseq <- c(sum(dat12$V1 * dat12$V2)/sum(dat12$V2), 
+                 sum(dat22$V1 * dat22$V2)/sum(dat22$V2), 
+                 sum(dat32$V1 * dat32$V2)/sum(dat32$V2), 
+                 sum(dat42$V1 * dat42$V2)/sum(dat42$V2), 
+                 sum(dat52$V1 * dat52$V2)/sum(dat52$V2), 
+                 sum(dat62$V1 * dat62$V2)/sum(dat62$V2))
+
+```
+
+
+
+```{r, echo=FALSE}
+
+run <- c("SRR1554537", "SRR1554538", "SRR1554541", "SRR1554535", "SRR1554536",
+         "SRR1554539")
+isolate <- c("R3452", "R3462", "R3485", "R2869", "R3098", "R3467")
+age <- c(-0.3836, -0.4027, -0.3836, 41.58, 44.17, 36.5)
+sex <- c("female", "female", "male", "male", "female", "female")
+RIN <- c(9.6, 6.4, 5.7, 8.7, 5.3, 9)
+sample <- c("fetal", "fetal", "fetal", "adult", "adult", "adult")
+nreads <- c(55133946, 68026190, 69278357, 38063721, 21450348, 33742728)
+perc_read <- c("100%", "100%", "100%", "100%", "100%", "100%")
+
+dat <- data.frame(run, isolate, age, sex, RIN, sample, nreads, perc_read,
+                  mean_perbase, mean_perseq)
+knitr::kable(dat)
+
+```
+
+## Question: Is the mapping rates similar for fetal and adult samples?
+Yes. As we can see, both fetal group and adult group have 100% mapping rates.
+
+## Question: Is there a trend in the average quality score of mapped reads?
+
+No. I used two-sided t-test to compare fetal group and adult group. The results below show that neither **mean_perbase** nor **mean_perseq** has difference between two groups under the 0.05 significance level (their p-values are all larger than 0.05).
+
+```{r}
+
+t.test(dat$mean_perbase[dat$sample == "fetal"], dat$mean_perbase[dat$sample == "adult"])
+t.test(dat$mean_perseq[dat$sample == "fetal"], dat$mean_perseq[dat$sample == "adult"])
+
+```
