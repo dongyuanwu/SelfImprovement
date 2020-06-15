@@ -1,0 +1,14 @@
+﻿# Coursera: Data Science Specialization (from JHU)
+
+## This is my personal learning record.
+
+* Course 1: The Data Scientist’s Toolbox (04/13/2019-04/14/2019, Completed)
+* Course 2: R Programming (04/14/2019-04/16/2019, Completed)
+* Course 3: Getting and Cleaning Data (04/16/2019-05/03/2019, Completed)
+* Course 4: Exploratory Data Analysis (05/02/2019-05/07/2019, Completed)
+* Course 5: Reproducible Research (05/04/2019-05/08/2019, Completed)
+* Course 6: Statistical Inference (05/07/2019-05/13/2019, Completed)
+* Course 7: Linear Models (05/10/2019-05/17/2019, Completed)
+* Course 8: Practical Machine Learning (05/14/2019-05/22/2019, Completed)
+* Course 9: Developing Data Products (05/15/2019-05/19/2019, Completed)
+* Course 10: Data Science Capstone (06/21/2019-07/03/2019, Completed)

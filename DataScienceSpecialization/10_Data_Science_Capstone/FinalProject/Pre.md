@@ -1,0 +1,46 @@
+Presentation
+========================================================
+author: Dongyuan Wu
+date: 2019-07-01
+autosize: true
+
+# Introduction for the App: NextWord
+
+Background
+========================================================
+
+- The aim of this App is to predict the next word for the user's input rapidly and accurately.
+
+- The dataset used in this App was sampled from Twitter, News and Blogs.
+
+- The algorithm is based on the back-off N-gram models.
+
+Algorithm
+========================================================
+
+1. Filter the user specified sequence of words by applying same techniques to clean the training data sets.
+
+2. Depending upon the number of words specified by the user, extract last four or three or two or the last one word.
+
+3. First use a 5-grams model: the first four words of which are the last four words of the user provided sentence. If no 5-grams is matched, back-off to 4-grams. Match the first three words of 4-grams with the last three words of the sentence. If no 4-grams is matched, back-off to 3-grams. If no 3-grams is matched, back-off to 2-grams.
+
+4. Finally, if no match found in 2-grams, return message to tell the user the App could not predict the word.
+
+How to Use It
+========================================================
+
+- User enters a sequence of words in the text box, then press "Submit" button.
+
+- The predicted next word is displayed with a note indicating which specific n-gram was used for next word prediction.
+
+- User entered sentence is also displayed in the Shiny GUI.
+
+Have A Try!
+========================================================
+
+- App: [NextWord](https://dongyuanwu.shinyapps.io/NextWord/)
+
+- Github: [Github](https://github.com/dongyuanwu/DataScienceSpecialization/tree/master/10_Data_Science_Capstone/FinalProject)
+
+
+## Thank you!

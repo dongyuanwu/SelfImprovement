@@ -1,0 +1,27 @@
+---
+title: "Presentation"
+author: "Dongyuan Wu"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(plotly)
+library(ggplot2)
+```
+
+## Mtcars Dataset
+
+```{r}
+
+mtcars$am <- factor(mtcars$am, levels=c(0, 1), labels=c("Automatic", "Manual"))
+mtcars$vs <- factor(mtcars$vs, levels=c(0, 1), labels=c("V-shaped", "Straight"))
+p <- ggplot(mtcars, aes(x=factor(am), y=mpg, fill=factor(am))) + geom_boxplot() +
+    labs(x="Transmissions", y="Miles/(US) Gallon",
+         title="Miles Per (US) Gallon for Different Transmissions") +
+    guides(fill=guide_legend(title="Transmissions")) + facet_grid( ~ vs)
+
+(gg <- ggplotly(p))
+
+```

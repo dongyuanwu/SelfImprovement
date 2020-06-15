@@ -1,0 +1,220 @@
+---
+title: "ToothGrowth Data Analysis"
+author: "Dongyuan Wu"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Overview
+
+This project analyzes the ToothGrowth data in the R datasets package. The following things will be done:
+
+1. Load the ToothGrowth data and perform some basic exploratory data analyses.
+
+2. Provide a basic summary of the data.
+
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+4. State your conclusions and the assumptions needed for your conclusions.
+
+## 1. Load the ToothGrowth data and perform some basic exploratory data analyses.
+
+```{r}
+
+data(ToothGrowth)
+str(ToothGrowth)
+
+```
+
+We can find that ToothGrowth data has `r nrow(ToothGrowth)` observations and `r ncol(ToothGrowth)` variables. The tooth length (len) is a numeric variable, the supplement type (supp) is a factor variable, and the dose in milligrams per day (dose) is a numeric variable.
+
+## 2. Provide a basic summary of the data.
+
+```{r}
+
+summary(ToothGrowth)
+
+```
+
+The mean and median of the tooth lengths is `r round(mean(ToothGrowth$len), 4)` and `r round(median(ToothGrowth$len), 4)`. There are both 30 pigs receive VC or OJ, respectively.
+
+```{r}
+
+with(ToothGrowth, table(supp, dose))
+
+```
+
+As we can see, the dose in milligrams per day only has 3 values, so we consider it as a factor variable.
+
+Then draw a boxplot to investigate the tooth lengths.
+
+```{r}
+
+library(ggplot2)
+
+ggplot(ToothGrowth, aes(x=factor(dose), y=len, fill=factor(dose))) + 
+    geom_boxplot() + facet_grid(. ~ supp) +
+    labs(x="Dose in Milligrams Per Day", y="Tooth Length",
+         title="Effect of Dose and Supplement Type on Tooth Growth") +
+    guides(fill=guide_legend(title="Dose"))
+
+```
+
+We can find tooth length grows up as the dose increases. When dose is less than 2 milligrams/day, OJ will let tooth length longer than VC.
+
+## 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.
+
+### 3.1 Comparation between tooth growth by different supplement types
+
+```{r, echo=FALSE}
+
+t.dose.05 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 0.5, ])
+t.dose.1 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 1, ])
+t.dose.2 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 2, ])
+t.dose <- t.test(len ~ supp, data = ToothGrowth)
+
+ttest1 <- data.frame(pvalue=c(t.dose.05$p.value, t.dose.1$p.value,
+                              t.dose.2$p.value, t.dose$p.value),
+                     CI.lower=c(t.dose.05$conf.int[1],t.dose.1$conf.int[1],
+                                t.dose.2$conf.int[1], t.dose$conf.int[1]),
+                     CI.upper=c(t.dose.05$conf.int[2],t.dose.1$conf.int[2],
+                                t.dose.2$conf.int[2], t.dose$conf.int[2]))
+rownames(ttest1) <- c("OJ vs. VC at 0.5 dose", "OJ vs. VC at 1 dose",
+                      "OJ vs. VC at 2 dose", "OJ vs. VC")
+ttest1
+
+```
+
+We can find if we just compare tooth growth by different supplement types without considering dose, OJ and VC seem to be the same (pvalue is larger than 0.05 and the confidence interval contains zero). However, the tooth growth by supplement types are different if we just consider 0.5 dose or 1 dose (pvalue is smaller than 0.05 and the confidence interval does not contain zero).
+
+### 3.2 Comparation between tooth growth by different doses
+
+```{r, echo=FALSE}
+
+# compare dose 0.5 and dose 1
+t.d1.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 2, ])
+t.d1.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 2, ])
+t.d1 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 2, ])
+
+# compare dose 2 and dose 1
+t.d2.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 0.5, ])
+t.d2.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 0.5, ])
+t.d2 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 0.5, ])
+
+# compare dose 0.5 and dose 2
+t.d3.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 1, ])
+t.d3.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 1, ])
+t.d3 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 1, ])
+
+ttest2 <- data.frame(pvalue=c(t.d1.OJ$p.value, t.d1.VC$p.value, t.d1$p.value,
+                              t.d2.OJ$p.value, t.d2.VC$p.value, t.d2$p.value,
+                              t.d3.OJ$p.value, t.d3.VC$p.value, t.d3$p.value),
+                     CI.lower=c(t.d1.OJ$conf.int[1], t.d1.VC$conf.int[1], t.d1$conf.int[1],
+                                t.d2.OJ$conf.int[1], t.d2.VC$conf.int[1], t.d2$conf.int[1],
+                                t.d3.OJ$conf.int[1], t.d3.VC$conf.int[1], t.d3$conf.int[1]),
+                     CI.upper=c(t.d1.OJ$conf.int[2], t.d1.VC$conf.int[2], t.d1$conf.int[2],
+                                t.d2.OJ$conf.int[2], t.d2.VC$conf.int[2], t.d2$conf.int[2],
+                                t.d3.OJ$conf.int[2], t.d3.VC$conf.int[2], t.d3$conf.int[2]))
+rownames(ttest2) <- c("dose .5 vs. 1 at OJ", "dose .5 vs. 1 at VC", "dose .5 vs. 1",
+                      "dose 1 vs. 2 at OJ", "dose 1 vs. 2 at VC", "dose 1 vs. 2",
+                      "dose .5 vs. 2 at OJ", "dose .5 vs. 2 at VC", "dose .5 vs. 2")
+ttest2
+
+```
+
+We can find there are significant differences among doses, whichever supplement type.
+
+## 4. State your conclusions and the assumptions needed for your conclusions.
+
+
+### 4.1 Assumptions
+
+1. Variances of tooth growth are different (var.equal=FALSE).
+
+2. Observations are independent.
+
+### 4.2 Conclusions
+
+1. For lower doses (0.5 and 1 mg), OJ will let tooth length be longer than VC.
+
+2. For high doses (2 mg), tooth growth is the same for different supplement types.
+
+3. Higher doses will provide more tooth growth, whichever supplement type.
+
+\newpage
+
+## Appendix
+
+### 1. Code for comparation between tooth growth by different supplement types
+
+```{r}
+
+t.dose.05 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 0.5, ])
+t.dose.1 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 1, ])
+t.dose.2 <- t.test(len ~ supp, data = ToothGrowth[ToothGrowth$dose == 2, ])
+t.dose <- t.test(len ~ supp, data = ToothGrowth)
+
+ttest1 <- data.frame(pvalue=c(t.dose.05$p.value, t.dose.1$p.value,
+                              t.dose.2$p.value, t.dose$p.value),
+                     CI.lower=c(t.dose.05$conf.int[1],t.dose.1$conf.int[1],
+                                t.dose.2$conf.int[1], t.dose$conf.int[1]),
+                     CI.upper=c(t.dose.05$conf.int[2],t.dose.1$conf.int[2],
+                                t.dose.2$conf.int[2], t.dose$conf.int[2]))
+rownames(ttest1) <- c("OJ vs. VC at 0.5 dose", "OJ vs. VC at 1 dose",
+                      "OJ vs. VC at 2 dose", "OJ vs. VC")
+ttest1
+
+```
+
+### 2. Code for comparation between tooth growth by different doses
+
+```{r}
+
+# compare dose 0.5 and dose 1
+t.d1.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 2, ])
+t.d1.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 2, ])
+t.d1 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 2, ])
+
+# compare dose 2 and dose 1
+t.d2.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 0.5, ])
+t.d2.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 0.5, ])
+t.d2 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 0.5, ])
+
+# compare dose 0.5 and dose 2
+t.d3.OJ <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose != 1, ])
+t.d3.VC <- t.test(len ~ factor(dose), 
+                  data = ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose != 1, ])
+t.d3 <- t.test(len ~ factor(dose), 
+               data = ToothGrowth[ToothGrowth$dose != 1, ])
+
+ttest2 <- data.frame(pvalue=c(t.d1.OJ$p.value, t.d1.VC$p.value, t.d1$p.value,
+                              t.d2.OJ$p.value, t.d2.VC$p.value, t.d2$p.value,
+                              t.d3.OJ$p.value, t.d3.VC$p.value, t.d3$p.value),
+                     CI.lower=c(t.d1.OJ$conf.int[1], t.d1.VC$conf.int[1], t.d1$conf.int[1],
+                                t.d2.OJ$conf.int[1], t.d2.VC$conf.int[1], t.d2$conf.int[1],
+                                t.d3.OJ$conf.int[1], t.d3.VC$conf.int[1], t.d3$conf.int[1]),
+                     CI.upper=c(t.d1.OJ$conf.int[2], t.d1.VC$conf.int[2], t.d1$conf.int[2],
+                                t.d2.OJ$conf.int[2], t.d2.VC$conf.int[2], t.d2$conf.int[2],
+                                t.d3.OJ$conf.int[2], t.d3.VC$conf.int[2], t.d3$conf.int[2]))
+rownames(ttest2) <- c("dose .5 vs. 1 at OJ", "dose .5 vs. 1 at VC", "dose .5 vs. 1",
+                      "dose 1 vs. 2 at OJ", "dose 1 vs. 2 at VC", "dose 1 vs. 2",
+                      "dose .5 vs. 2 at OJ", "dose .5 vs. 2 at VC", "dose .5 vs. 2")
+ttest2
+
+```

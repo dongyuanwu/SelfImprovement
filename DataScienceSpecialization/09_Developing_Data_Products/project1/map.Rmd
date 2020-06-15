@@ -1,0 +1,28 @@
+---
+title: "Leaflet"
+author: "Dongyuan Wu"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Map
+
+```{r}
+
+library(leaflet)
+
+df <- data.frame(lat=runif(500, min=29.54, max=29.74),
+                 lng=runif(500, min=-82.45, max=-82.25))
+df %>%
+    leaflet() %>%
+    addTiles() %>%
+    addMarkers(clusterOptions=markerClusterOptions())
+
+```
+
