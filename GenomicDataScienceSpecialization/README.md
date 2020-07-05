@@ -9,4 +9,4 @@
 * Course 5: Command Line Tools for Genomic Data Science (04/25/2020-05/15/2020, Completed)
 * Course 6: Bioconductor for Genomic Data Science (08/15/2019-08/20/2019, Completed)
 * Course 7: Statistics for Genomic Data Science (08/19/2019-08/22/2019, Completed)
-* Course 8: Genomic Data Science Capstone (05/18/2020- , Ongoing)
+* Course 8: Genomic Data Science Capstone (05/18/2020-07/04/2020 , Completed)
